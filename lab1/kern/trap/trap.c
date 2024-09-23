@@ -12,7 +12,7 @@
 
 #define TICK_NUM 100
 volatile size_t num=0;
-volatile size_t PRINT_NUM=0;
+
 
 static void print_ticks() {
     cprintf("%d ticks\n", TICK_NUM);
@@ -116,8 +116,8 @@ void interrupt_handler(struct trapframe *tf) {
             clock_set_next_event();
             if(++ticks%TICK_NUM == 0){
             	print_ticks();
-            	PRINT_NUM++;
-            	if(PRINT_NUM == 10){
+            	num++;
+            	if(num == 10){
             	   sbi_shutdown();
             	}
             }
