@@ -172,7 +172,7 @@ void exception_handler(struct trapframe *tf) {
             */
             cprintf("Exception type: Breakpoint\n");
             cprintf("Exception address: 0x%08x\n", tf->epc);
-            tf->epc += 4;
+            tf->epc += 2;
             break;
         case CAUSE_MISALIGNED_LOAD:
             break;
