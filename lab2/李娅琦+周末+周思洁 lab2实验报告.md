@@ -288,7 +288,7 @@ buddy_system_init_memmap(struct Page *base, size_t n) {
 #### 内存分配
 根据请求的大小，快速分配一个合适的内存块，并将其从空闲链表中移除。 
 
-1. 选择合适大小的内存块：首先需要确定哪个链表中包含适合当前请求的内存块。buddy系统按二的幂次划分内存，因此通过二进制位运算可以快速找到合适的块。
+1. 选择合适大小的内存块：首先需要确定哪个链表中包含适合当前请求的内存块。buddy系统按二的幂次划分内存，因此通过二进制位运算可以快速找到合适的块。但其中可能存在我们需要的最合适的块大小在链表中不存在，需要分裂一个更大的块；
 ```c
 static struct Page *
 buddy_system_alloc_pages(size_t n) {
@@ -446,26 +446,41 @@ static void buddy_system_check(void)
 {
     struct Page *p0, *p1, *p2, *p3;
 
-    // 测试 1 页的分配和释放
-    p0 = buddy_system_alloc_pages(1);
-    assert(p0 != NULL);
-    buddy_system_free_pages(p0, 1);
-
-    // 测试 2 页和 4 页的分配
-    p1 = buddy_system_alloc_pages(2);
-    p2 = buddy_system_alloc_pages(4);
-    assert(p1 != NULL && p2 != NULL);
-
-    // 测试释放并合并
+    //检验合并是否成功
+     cprintf("%d",nr_free(1));//0
+     p0 = buddy_system_alloc_pages(2);
+     assert(nr_free(1)==1);
+     p3 = buddy_system_alloc_pages(2);
+     assert(nr_free(1)==0);
+     p2 = buddy_system_alloc_pages(4);
+     assert(nr_free(1) ==0&&nr_free(2)==0 );
+    buddy_system_free_pages(p3, 2);
+    assert(nr_free(1)==1);
     buddy_system_free_pages(p2, 4);
+    buddy_system_free_pages(p0, 2);
+    assert(nr_free(1)==0);
 
-    // 测试 8 页分配
+    // 测试 2 页的分配和释放
+  
+    p0 = buddy_system_alloc_pages(2);
+    assert(p0 != NULL);
+    buddy_system_free_pages(p0, 2);
+    
+    
+    //非二次幂分配
+    p0 = buddy_system_alloc_pages(3);
+    assert(p0 != NULL);
+    buddy_system_free_pages(p0, 4);
+
+    // // 测试 8 页分配
     p3 = buddy_system_alloc_pages(8);
     assert(p3 != NULL);
     buddy_system_free_pages(p3, 8);
 
+
     cprintf("buddy system tests passed.\n");
 }
+
 ```
 结果如下
 ```c
@@ -485,6 +500,6 @@ satp physical address: 0x0000000080205000
 ```
 
 ### 扩展练习Challenge3：可用物理内存获取
-- 内存管理单元（MMU）：操作系统可以通过查询 MMU 或硬件特性来确定可用内存的物理地址范围。某些处理器提供寄存器或特性，用于报告可用内存信息。
+- 内存管理单元（MMU）：操作系统可以通过查询 MMU 或硬件特性（例如我们实验中的openSBI）来确定可用内存的物理地址范围。某些处理器提供寄存器或特性，用于报告可用内存信息。
 - BIOS/UEFI 提供内存映射信息，列出可用内存区域和保留内存区域
 - 设置内存访问权限。如果访问超出分配范围的内存，则返回零。
