@@ -291,48 +291,31 @@ static void buddy_system_check(void)
 {
     struct Page *p0, *p1, *p2, *p3;
 
-
-    cprintf("%d",nr_free(1));//0
-     p0 = buddy_system_alloc_pages(2);
-     cprintf("%d",nr_free(1));//1
-     p3 = buddy_system_alloc_pages(2);
+    //检验合并是否成功
      cprintf("%d",nr_free(1));//0
+     p0 = buddy_system_alloc_pages(2);
+     assert(nr_free(1)==1);
+     p3 = buddy_system_alloc_pages(2);
+     assert(nr_free(1)==0);
      p2 = buddy_system_alloc_pages(4);
      assert(nr_free(1) ==0&&nr_free(2)==0 );
-     cprintf("%d",nr_free(1));//0
-     cprintf("%d",nr_free(2));//0
-    cprintf("%d",nr_free(1));//0
     buddy_system_free_pages(p3, 2);
-    //assert(nr_free(2)!=0);
-    cprintf("%d",nr_free(1));//1
+    assert(nr_free(1)==1);
     buddy_system_free_pages(p2, 4);
     buddy_system_free_pages(p0, 2);
+    assert(nr_free(1)==0);
 
-
-    // 测试 1 页的分配和释放
-    cprintf("%d",nr_free(1));//0
+    // 测试 2 页的分配和释放
+  
     p0 = buddy_system_alloc_pages(2);
-    cprintf("%d",nr_free(1));//1
     assert(p0 != NULL);
     buddy_system_free_pages(p0, 2);
-    cprintf("%d",nr_free(1));//0
-
+    
+    
     //非二次幂分配
     p0 = buddy_system_alloc_pages(3);
     assert(p0 != NULL);
     buddy_system_free_pages(p0, 4);
-
-    // 测试 2 页和 4 页的分配
-    p1 = buddy_system_alloc_pages(2);
-    p2 = buddy_system_alloc_pages(4);
-    assert(p1 != NULL && p2 != NULL);
-    // buddy_system_free_pages(p1, 2);
-    //p3 = buddy_system_alloc_pages(4);
-    cprintf("%d",nr_free(1));
-    cprintf("%d",nr_free(2));
-    // 测试释放并合并
-    buddy_system_free_pages(p2, 4);
-    buddy_system_free_pages(p1, 2);
 
     // // 测试 8 页分配
     p3 = buddy_system_alloc_pages(8);
