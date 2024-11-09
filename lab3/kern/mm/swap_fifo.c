@@ -69,6 +69,7 @@ _fifo_swap_out_victim(struct mm_struct *mm, struct Page ** ptr_page, int in_tick
      //(2)  set the addr of addr of this page to ptr_page
     list_entry_t* entry = list_prev(head);
     if (entry != head) {
+        cprintf("curr_ptr %p\n", entry);
         list_del(entry);
         *ptr_page = le2page(entry, pra_page_link);
     } else {

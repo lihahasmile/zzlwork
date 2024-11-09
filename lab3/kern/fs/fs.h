@@ -4,6 +4,7 @@
 #include <mmu.h>
 
 #define SECTSIZE            512
+//一页需要几个磁盘扇区?
 #define PAGE_NSECT          (PGSIZE / SECTSIZE)
 
 #define SWAP_DEV_NO         1
